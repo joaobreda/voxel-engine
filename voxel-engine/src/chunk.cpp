@@ -5,12 +5,35 @@ Chunk::Chunk() {
     elements = 0;
     changed = true;
     glGenBuffers(1, &VBO);
-    for (int x = 0; x < CX; x++)
-    {
-        for (int y = 0; y < CY; y++)
-        {
-            for (int z = 0; z < CZ; z++)
-            {
+    // Putting blocks in all of the positions avaible for this chunk
+    for (int x = 0; x < CX; x++) {
+        for (int y = 0; y < CY; y++) {
+            for (int z = 0; z < CZ; z++) {
+                Set(x, y, z, 1);
+            }
+        }
+    }
+}
+
+Chunk::Chunk(int i, int j, int k, Chunk** XN, Chunk** XP, Chunk** YN, Chunk** YP, Chunk** ZN, Chunk** ZP) {
+    memset(blk, 0, sizeof(blk));
+    elements = 0;
+    changed = true;
+    glGenBuffers(1, &VBO);
+    // setting chunk position relative to map
+    posX = i * CX;
+    posY = j * CY;
+    posZ = k * CZ;
+    cXN = XN;
+    cXP = XP;
+    cYN = YN;
+    cYP = YP;
+    cZN = ZN;
+    cZP = ZP;
+    // Putting blocks in all of the positions avaible for this chunk
+    for (int x = 0; x < CX; x++) {
+        for (int y = 0; y < CY; y++) {
+            for (int z = 0; z < CZ; z++) {
                 Set(x, y, z, 1);
             }
         }
@@ -30,6 +53,7 @@ void Chunk::Set(int x, int y, int z, uint8_t type) {
     changed = true;
 }
 
+// Where the mesh is created
 void Chunk::Update() {
     changed = false;
 
@@ -46,52 +70,124 @@ void Chunk::Update() {
                     continue;
 
                 // View from negative x
-                vertex[i++] = byte4(x, y, z, type);
-                vertex[i++] = byte4(x, y, z + 1, type);
-                vertex[i++] = byte4(x, y + 1, z, type);
-                vertex[i++] = byte4(x, y + 1, z, type);
-                vertex[i++] = byte4(x, y, z + 1, type);
-                vertex[i++] = byte4(x, y + 1, z + 1, type);
+                if (cXN) {
+                    if (x == 0 && !(*cXN)->blk[CX - 1][y][z]) {
+                        vertex[i++] = byte4(x, y, z, type);
+                        vertex[i++] = byte4(x, y, z + 1, type);
+                        vertex[i++] = byte4(x, y + 1, z, type);
+                        vertex[i++] = byte4(x, y + 1, z, type);
+                        vertex[i++] = byte4(x, y, z + 1, type);
+                        vertex[i++] = byte4(x, y + 1, z + 1, type);
+                    }
+                }
+                else if (x == 0 || (x > 0 && !blk[x - 1][y][z])) {
+                    vertex[i++] = byte4(x, y, z, type);
+                    vertex[i++] = byte4(x, y, z + 1, type);
+                    vertex[i++] = byte4(x, y + 1, z, type);
+                    vertex[i++] = byte4(x, y + 1, z, type);
+                    vertex[i++] = byte4(x, y, z + 1, type);
+                    vertex[i++] = byte4(x, y + 1, z + 1, type);
+                }
 
                 // View from positive x
-                vertex[i++] = byte4(x + 1, y, z, type);
-                vertex[i++] = byte4(x + 1, y + 1, z, type);
-                vertex[i++] = byte4(x + 1, y, z + 1, type);
-                vertex[i++] = byte4(x + 1, y + 1, z, type);
-                vertex[i++] = byte4(x + 1, y + 1, z + 1, type);
-                vertex[i++] = byte4(x + 1, y, z + 1, type);
+                if (cXP) {
+                    if (x == CX - 1 && !(*cXP)->blk[0][y][z]) {
+                        vertex[i++] = byte4(x + 1, y, z, type);
+                        vertex[i++] = byte4(x + 1, y + 1, z, type);
+                        vertex[i++] = byte4(x + 1, y, z + 1, type);
+                        vertex[i++] = byte4(x + 1, y + 1, z, type);
+                        vertex[i++] = byte4(x + 1, y + 1, z + 1, type);
+                        vertex[i++] = byte4(x + 1, y, z + 1, type);
+                    }
+                }
+                else if (x == CX - 1 || (x < CX - 1 && !blk[x + 1][y][z])) {
+                    vertex[i++] = byte4(x + 1, y, z, type);
+                    vertex[i++] = byte4(x + 1, y + 1, z, type);
+                    vertex[i++] = byte4(x + 1, y, z + 1, type);
+                    vertex[i++] = byte4(x + 1, y + 1, z, type);
+                    vertex[i++] = byte4(x + 1, y + 1, z + 1, type);
+                    vertex[i++] = byte4(x + 1, y, z + 1, type);
+                }
 
                 // View from negative y
-                vertex[i++] = byte4(x, y, z, type);
-                vertex[i++] = byte4(x + 1, y, z, type);
-                vertex[i++] = byte4(x, y, z + 1, type);
-                vertex[i++] = byte4(x + 1, y, z, type);
-                vertex[i++] = byte4(x + 1, y, z + 1, type);
-                vertex[i++] = byte4(x, y, z + 1, type);
+                if (cYN) {
+                    if (y == 0 && !(*cYN)->blk[x][CY - 1][z]) {
+                        vertex[i++] = byte4(x, y, z, type);
+                        vertex[i++] = byte4(x + 1, y, z, type);
+                        vertex[i++] = byte4(x, y, z + 1, type);
+                        vertex[i++] = byte4(x + 1, y, z, type);
+                        vertex[i++] = byte4(x + 1, y, z + 1, type);
+                        vertex[i++] = byte4(x, y, z + 1, type);
+                    }
+                }
+                else if (y == 0 || (y > 0 && !blk[x][y - 1][z])) {
+                    vertex[i++] = byte4(x, y, z, type);
+                    vertex[i++] = byte4(x + 1, y, z, type);
+                    vertex[i++] = byte4(x, y, z + 1, type);
+                    vertex[i++] = byte4(x + 1, y, z, type);
+                    vertex[i++] = byte4(x + 1, y, z + 1, type);
+                    vertex[i++] = byte4(x, y, z + 1, type);
+                }
 
                 // View from positive y
-                vertex[i++] = byte4(x, y + 1, z, type);
-                vertex[i++] = byte4(x, y + 1, z + 1, type);
-                vertex[i++] = byte4(x + 1, y + 1, z, type);
-                vertex[i++] = byte4(x + 1, y + 1, z, type);
-                vertex[i++] = byte4(x, y + 1, z + 1, type);
-                vertex[i++] = byte4(x + 1, y + 1, z + 1, type);
+                if (cYP) {
+                    if (y == CY - 1 && !(*cYP)->blk[x][0][z]) {
+                        vertex[i++] = byte4(x, y + 1, z, type);
+                        vertex[i++] = byte4(x, y + 1, z + 1, type);
+                        vertex[i++] = byte4(x + 1, y + 1, z, type);
+                        vertex[i++] = byte4(x + 1, y + 1, z, type);
+                        vertex[i++] = byte4(x, y + 1, z + 1, type);
+                        vertex[i++] = byte4(x + 1, y + 1, z + 1, type);
+                    }
+                }
+                else if (y == CY - 1 || (y < CY - 1 && !blk[x][y + 1][z])) {
+                    vertex[i++] = byte4(x, y + 1, z, type);
+                    vertex[i++] = byte4(x, y + 1, z + 1, type);
+                    vertex[i++] = byte4(x + 1, y + 1, z, type);
+                    vertex[i++] = byte4(x + 1, y + 1, z, type);
+                    vertex[i++] = byte4(x, y + 1, z + 1, type);
+                    vertex[i++] = byte4(x + 1, y + 1, z + 1, type);
+                }
 
                 // View from negative z
-                vertex[i++] = byte4(x, y, z, type);
-                vertex[i++] = byte4(x, y + 1, z, type);
-                vertex[i++] = byte4(x + 1, y, z, type);
-                vertex[i++] = byte4(x, y + 1, z, type);
-                vertex[i++] = byte4(x + 1, y + 1, z, type);
-                vertex[i++] = byte4(x + 1, y, z, type);
+                if (cZN) {
+                    if (z == 0 && !(*cZN)->blk[x][y][CZ - 1]) {
+                        vertex[i++] = byte4(x, y, z, type);
+                        vertex[i++] = byte4(x, y + 1, z, type);
+                        vertex[i++] = byte4(x + 1, y, z, type);
+                        vertex[i++] = byte4(x, y + 1, z, type);
+                        vertex[i++] = byte4(x + 1, y + 1, z, type);
+                        vertex[i++] = byte4(x + 1, y, z, type);
+                    }
+                }
+                else if (z == 0 || (z > 0 && !blk[x][y][z - 1])) {
+                    vertex[i++] = byte4(x, y, z, type);
+                    vertex[i++] = byte4(x, y + 1, z, type);
+                    vertex[i++] = byte4(x + 1, y, z, type);
+                    vertex[i++] = byte4(x, y + 1, z, type);
+                    vertex[i++] = byte4(x + 1, y + 1, z, type);
+                    vertex[i++] = byte4(x + 1, y, z, type);
+                }
 
                 // View from positive z
-                vertex[i++] = byte4(x, y, z + 1, type);
-                vertex[i++] = byte4(x + 1, y, z + 1, type);
-                vertex[i++] = byte4(x, y + 1, z + 1, type);
-                vertex[i++] = byte4(x, y + 1, z + 1, type);
-                vertex[i++] = byte4(x + 1, y, z + 1, type);
-                vertex[i++] = byte4(x + 1, y + 1, z + 1, type);
+                if (cZP) {
+                    if (z == CZ - 1 && !(*cZP)->blk[x][y][0]) {
+                        vertex[i++] = byte4(x, y, z + 1, type);
+                        vertex[i++] = byte4(x + 1, y, z + 1, type);
+                        vertex[i++] = byte4(x, y + 1, z + 1, type);
+                        vertex[i++] = byte4(x, y + 1, z + 1, type);
+                        vertex[i++] = byte4(x + 1, y, z + 1, type);
+                        vertex[i++] = byte4(x + 1, y + 1, z + 1, type);
+                    }
+                }
+                else if (z == CZ - 1 || (z < CZ - 1 && !blk[x][y][z + 1])) {
+                    vertex[i++] = byte4(x, y, z + 1, type);
+                    vertex[i++] = byte4(x + 1, y, z + 1, type);
+                    vertex[i++] = byte4(x, y + 1, z + 1, type);
+                    vertex[i++] = byte4(x, y + 1, z + 1, type);
+                    vertex[i++] = byte4(x + 1, y, z + 1, type);
+                    vertex[i++] = byte4(x + 1, y + 1, z + 1, type);
+                }
             }
         }
     }
@@ -117,8 +213,8 @@ void Chunk::Render() {
     if (!elements)
         return;
 
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_CULL_FACE);
+    //glEnable(GL_DEPTH_TEST);
 
     glBindVertexArray(VAO);
 

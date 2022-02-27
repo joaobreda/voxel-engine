@@ -144,12 +144,14 @@
   <ItemGroup>
     <ClCompile Include="src\chunk.cpp" />
     <ClCompile Include="include\glad.c" />
+    <ClCompile Include="src\chunkmanager.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\process.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\chunk.h" />
     <ClInclude Include="headers\camera.h" />
+    <ClInclude Include="headers\chunkmanager.h" />
     <ClInclude Include="headers\main.h" />
     <ClInclude Include="headers\process.h" />
     <ClInclude Include="headers\shader.h" />

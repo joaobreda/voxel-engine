@@ -7,7 +7,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "process.h"
-#include "chunk.h"
+#include "chunkmanager.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

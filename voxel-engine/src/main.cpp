@@ -7,12 +7,12 @@ float lastX = SCR_WIDTH / 2.0f, lastY = SCR_HEIGHT / 2.0f;
 float deltaTime = 0.0f, lastFrame = 0.0f;
 // check if first time moving mouse to prevent mouse jump
 bool firstMouse = true;
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 270.0f, 0.0f));
 
 int main() {
     GLFWwindow* window = setupWindow(SCR_WIDTH, SCR_HEIGHT, "Voxel Engine");
-    Shader shader("C:\\Users\\Breda\\Documents\\OpenGL\\voxelEngine\\voxelEngine\\shaders\\vertex.glsl", "C:\\Users\\Breda\\Documents\\OpenGL\\voxelEngine\\voxelEngine\\shaders\\fragment.glsl");
-    Chunk chunk;
+    ChunkManager chunkManager;
+    Shader shader("C:\\Users\\Breda\\Documents\\voxel-engine\\voxel-engine\\shaders\\vertex.glsl", "C:\\Users\\Breda\\Documents\\voxel-engine\\voxel-engine\\shaders\\fragment.glsl");
 
     shader.use();
 
@@ -26,7 +26,7 @@ int main() {
         processInput(window);
 
         // render
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(55.0f/255.0f , 184.0f/255.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // pass projection matrix to shader (note that in this case it could change every frame)
@@ -38,12 +38,7 @@ int main() {
         shader.setMat4("view", view);
 
         // model matrix
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        shader.setMat4("model", model);
-
-        // render objects
-        chunk.Render();
+        chunkManager.Render(shader);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
