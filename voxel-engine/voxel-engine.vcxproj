@@ -145,6 +145,12 @@
     <ClCompile Include="src\chunk.cpp" />
     <ClCompile Include="include\glad.c" />
     <ClCompile Include="src\chunkmanager.cpp" />
+    <ClCompile Include="src\imgui.cpp" />
+    <ClCompile Include="src\imgui_draw.cpp" />
+    <ClCompile Include="src\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\imgui_tables.cpp" />
+    <ClCompile Include="src\imgui_widgets.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\process.cpp" />
   </ItemGroup>

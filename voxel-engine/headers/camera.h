@@ -23,7 +23,6 @@ private:
     const float SENSITIVITY = 0.1f;
     const float ZOOM = 45.0f;
     // camera Attributes
-    glm::vec3 Position;
     glm::vec3 Front;
     glm::vec3 Up;
     glm::vec3 Right;
@@ -46,6 +45,7 @@ private:
     }
 public:
     // camera options
+    glm::vec3 Position;
     float MovementSpeed;
     float MouseSensitivity;
     float Zoom;

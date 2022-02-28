@@ -58,7 +58,7 @@ void ChunkManager::Render(Shader shader) {
         for (int y = 0; y < SCY; y++)
             for (int z = 0; z < SCZ; z++)
                 if (chunks[x][y][z]) {
-                    // changing each chunk position so they aren't stacked on top of eachother
+                    // changing each chunk to their position so they aren't stacked on top of eachother
                     glm::mat4 model = glm::translate(glm::mat4(1), glm::vec3(chunks[x][y][z]->posX, chunks[x][y][z]->posY, chunks[x][y][z]->posZ));
                     shader.setMat4("model", model);
 

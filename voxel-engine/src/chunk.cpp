@@ -213,8 +213,8 @@ void Chunk::Render() {
     if (!elements)
         return;
 
-    //glEnable(GL_CULL_FACE);
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 
     glBindVertexArray(VAO);
 
