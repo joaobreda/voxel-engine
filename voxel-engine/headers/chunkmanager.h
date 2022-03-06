@@ -7,15 +7,25 @@
 
 #include "chunk.h"
 #include "main.h"
+#include <math.h>
+
+using ChunkMap = std::unordered_map<glm::vec3, std::shared_ptr<Chunk>,
+	std::hash<glm::vec3>, std::equal_to<glm::vec3>>;
+using ChunkIterator = std::unordered_map<glm::vec3, std::shared_ptr<Chunk>,
+	std::hash<glm::vec3>, std::equal_to<glm::vec3>>::iterator;
 
 class ChunkManager {
-private:
-	Chunk* chunks[SCX][SCY][SCZ];
 public:
+	ChunkMap chunks;
 	ChunkManager();
 	~ChunkManager();
-	uint8_t Get(int x, int y, int z);
-	void Set(int x, int y, int z, uint8_t type);
+	inline ChunkIterator begin() { return chunks.begin(); }
+	inline ChunkIterator end() { return chunks.end(); }
+	inline std::shared_ptr<Chunk> GetChunk(const glm::vec3& pos) {
+		if (chunks[pos] != nullptr)
+			return chunks[pos];
+		return nullptr;
+	}
 	void Render(Shader shader);
 };
 #endif

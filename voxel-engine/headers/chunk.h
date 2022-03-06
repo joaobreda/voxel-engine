@@ -7,6 +7,9 @@
 
 #include <glad/glad.h> 
 #include <glm/gtc/type_ptr.hpp>
+#include <memory>
+#include <unordered_map>
+#include "glm/gtx/hash.hpp"
 
 typedef glm::tvec4<GLbyte> byte4;
 
@@ -17,15 +20,14 @@ private:
     unsigned int VBO, VAO;
     int elements;
     bool changed;
- 
 public:
     // Global map position of this chunk 
     int posX, posY, posZ;
-    // References to neighbouring chunks
-    Chunk **cXN, **cXP, **cYN, **cYP, **cZN, **cZP;
-
-    Chunk();
-    Chunk(int i, int j, int k, Chunk** cXN, Chunk** cXP, Chunk** cYN, Chunk** cYP, Chunk** cZN, Chunk** cZP);
+    // Reference chunkmap
+    using ChunkMap = std::unordered_map<glm::vec3, std::shared_ptr<Chunk>,
+        std::hash<glm::vec3>, std::equal_to<glm::vec3>>;
+    ChunkMap chunks;
+    Chunk(int i, int j, int k, const ChunkMap &chunks_m);
     ~Chunk();
     uint8_t Get(int x, int y, int z);
     void Set(int x, int y, int z, uint8_t type);

@@ -1,21 +1,6 @@
 #include "../headers/chunk.h"
 
-Chunk::Chunk() {
-    memset(blk, 0, sizeof(blk));
-    elements = 0;
-    changed = true;
-    glGenBuffers(1, &VBO);
-    // Putting blocks in all of the positions avaible for this chunk
-    for (int x = 0; x < CX; x++) {
-        for (int y = 0; y < CY; y++) {
-            for (int z = 0; z < CZ; z++) {
-                Set(x, y, z, 1);
-            }
-        }
-    }
-}
-
-Chunk::Chunk(int i, int j, int k, Chunk** XN, Chunk** XP, Chunk** YN, Chunk** YP, Chunk** ZN, Chunk** ZP) {
+Chunk::Chunk(int i, int j, int k, const ChunkMap &chunks_m) {
     memset(blk, 0, sizeof(blk));
     elements = 0;
     changed = true;
@@ -24,17 +9,13 @@ Chunk::Chunk(int i, int j, int k, Chunk** XN, Chunk** XP, Chunk** YN, Chunk** YP
     posX = i * CX;
     posY = j * CY;
     posZ = k * CZ;
-    cXN = XN;
-    cXP = XP;
-    cYN = YN;
-    cYP = YP;
-    cZN = ZN;
-    cZP = ZP;
-    // Putting blocks in all of the positions avaible for this chunk
+    // reference to all chunks
+    chunks = chunks_m;
+    // Putting blocks in all of the positions avaible for this chunk   
     for (int x = 0; x < CX; x++) {
         for (int y = 0; y < CY; y++) {
             for (int z = 0; z < CZ; z++) {
-                Set(x, y, z, 1);
+                Set(x, y, z, posY <= 0 ? 1 : 0);
             }
         }
     }
@@ -60,6 +41,14 @@ void Chunk::Update() {
     byte4 vertex[CX * CY * CZ * 6 * 6];
     int i = 0;
 
+    // NEIGHBORS
+    std::shared_ptr<Chunk> cXN = chunks[glm::vec3(posX / CX - 1, posY / CY, posZ / CZ)];
+    std::shared_ptr<Chunk> cXP = chunks[glm::vec3(posX / CX + 1, posY / CY, posZ / CZ)];
+    std::shared_ptr<Chunk> cYN = chunks[glm::vec3(posX / CX, posY / CY - 1, posZ / CZ)];
+    std::shared_ptr<Chunk> cYP = chunks[glm::vec3(posX / CX, posY / CY + 1, posZ / CZ)];
+    std::shared_ptr<Chunk> cZN = chunks[glm::vec3(posX / CX, posY / CY, posZ / CZ - 1)];
+    std::shared_ptr<Chunk> cZP = chunks[glm::vec3(posX / CX, posY / CY, posZ / CZ + 1)];
+
     for (int x = 0; x < CX; x++) {
         for (int y = 0; y < CY; y++) {
             for (int z = 0; z < CZ; z++) {
@@ -71,7 +60,7 @@ void Chunk::Update() {
 
                 // View from negative x
                 if (cXN) {
-                    if (x == 0 && !(*cXN)->blk[CX - 1][y][z]) {
+                    if (!cXN->blk[CX - 1][y][z]) {
                         vertex[i++] = byte4(x, y, z, type);
                         vertex[i++] = byte4(x, y, z + 1, type);
                         vertex[i++] = byte4(x, y + 1, z, type);
@@ -91,7 +80,7 @@ void Chunk::Update() {
 
                 // View from positive x
                 if (cXP) {
-                    if (x == CX - 1 && !(*cXP)->blk[0][y][z]) {
+                    if (x == CX - 1 && !cXP->blk[0][y][z]) {
                         vertex[i++] = byte4(x + 1, y, z, type);
                         vertex[i++] = byte4(x + 1, y + 1, z, type);
                         vertex[i++] = byte4(x + 1, y, z + 1, type);
@@ -111,7 +100,7 @@ void Chunk::Update() {
 
                 // View from negative y
                 if (cYN) {
-                    if (y == 0 && !(*cYN)->blk[x][CY - 1][z]) {
+                    if (y == 0 && !cYN->blk[x][CY - 1][z]) {
                         vertex[i++] = byte4(x, y, z, type);
                         vertex[i++] = byte4(x + 1, y, z, type);
                         vertex[i++] = byte4(x, y, z + 1, type);
@@ -131,7 +120,7 @@ void Chunk::Update() {
 
                 // View from positive y
                 if (cYP) {
-                    if (y == CY - 1 && !(*cYP)->blk[x][0][z]) {
+                    if (y == CY - 1 && !cYP->blk[x][0][z]) {
                         vertex[i++] = byte4(x, y + 1, z, type);
                         vertex[i++] = byte4(x, y + 1, z + 1, type);
                         vertex[i++] = byte4(x + 1, y + 1, z, type);
@@ -151,7 +140,7 @@ void Chunk::Update() {
 
                 // View from negative z
                 if (cZN) {
-                    if (z == 0 && !(*cZN)->blk[x][y][CZ - 1]) {
+                    if (z == 0 && !cZN->blk[x][y][CZ - 1]) {
                         vertex[i++] = byte4(x, y, z, type);
                         vertex[i++] = byte4(x, y + 1, z, type);
                         vertex[i++] = byte4(x + 1, y, z, type);
@@ -171,7 +160,7 @@ void Chunk::Update() {
 
                 // View from positive z
                 if (cZP) {
-                    if (z == CZ - 1 && !(*cZP)->blk[x][y][0]) {
+                    if (z == CZ - 1 && !cZP->blk[x][y][0]) {
                         vertex[i++] = byte4(x, y, z + 1, type);
                         vertex[i++] = byte4(x + 1, y, z + 1, type);
                         vertex[i++] = byte4(x, y + 1, z + 1, type);
@@ -213,8 +202,8 @@ void Chunk::Render() {
     if (!elements)
         return;
 
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_CULL_FACE);
+    //glEnable(GL_DEPTH_TEST);
 
     glBindVertexArray(VAO);
 
