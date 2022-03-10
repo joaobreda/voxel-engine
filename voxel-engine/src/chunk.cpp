@@ -1,17 +1,15 @@
 #include "../headers/chunk.h"
 
-Chunk::Chunk(int i, int j, int k, const ChunkMap &chunks_m) {
+Chunk::Chunk(int i, int j, int k) {
     memset(blk, 0, sizeof(blk));
     elements = 0;
     changed = true;
     glGenBuffers(1, &VBO);
-    // setting chunk position relative to map
+    // Setting chunk position relative to map
     posX = i * CX;
     posY = j * CY;
     posZ = k * CZ;
-    // reference to all chunks
-    chunks = chunks_m;
-    // Putting blocks in all of the positions avaible for this chunk   
+    // Putting blocks in all of the positions avaible for this chunk if it's Y is <= 0
     for (int x = 0; x < CX; x++) {
         for (int y = 0; y < CY; y++) {
             for (int z = 0; z < CZ; z++) {
@@ -22,6 +20,7 @@ Chunk::Chunk(int i, int j, int k, const ChunkMap &chunks_m) {
 }
 
 Chunk::~Chunk() {
+    glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
 }
 
@@ -34,20 +33,12 @@ void Chunk::Set(int x, int y, int z, uint8_t type) {
     changed = true;
 }
 
-// Where the mesh is created
+// Where this chunk's mesh is created
 void Chunk::Update() {
     changed = false;
 
     byte4 vertex[CX * CY * CZ * 6 * 6];
     int i = 0;
-
-    // NEIGHBORS
-    std::shared_ptr<Chunk> cXN = chunks[glm::vec3(posX / CX - 1, posY / CY, posZ / CZ)];
-    std::shared_ptr<Chunk> cXP = chunks[glm::vec3(posX / CX + 1, posY / CY, posZ / CZ)];
-    std::shared_ptr<Chunk> cYN = chunks[glm::vec3(posX / CX, posY / CY - 1, posZ / CZ)];
-    std::shared_ptr<Chunk> cYP = chunks[glm::vec3(posX / CX, posY / CY + 1, posZ / CZ)];
-    std::shared_ptr<Chunk> cZN = chunks[glm::vec3(posX / CX, posY / CY, posZ / CZ - 1)];
-    std::shared_ptr<Chunk> cZP = chunks[glm::vec3(posX / CX, posY / CY, posZ / CZ + 1)];
 
     for (int x = 0; x < CX; x++) {
         for (int y = 0; y < CY; y++) {
@@ -58,9 +49,11 @@ void Chunk::Update() {
                 if (!type)
                     continue;
 
+                // Culling unvisible faces below
+
                 // View from negative x
-                if (cXN) {
-                    if (!cXN->blk[CX - 1][y][z]) {
+                if (neighXN) {
+                    if (!neighXN->blk[CX - 1][y][z]) {
                         vertex[i++] = byte4(x, y, z, type);
                         vertex[i++] = byte4(x, y, z + 1, type);
                         vertex[i++] = byte4(x, y + 1, z, type);
@@ -79,8 +72,8 @@ void Chunk::Update() {
                 }
 
                 // View from positive x
-                if (cXP) {
-                    if (x == CX - 1 && !cXP->blk[0][y][z]) {
+                if (neighXP) {
+                    if (x == CX - 1 && !neighXP->blk[0][y][z]) {
                         vertex[i++] = byte4(x + 1, y, z, type);
                         vertex[i++] = byte4(x + 1, y + 1, z, type);
                         vertex[i++] = byte4(x + 1, y, z + 1, type);
@@ -99,8 +92,8 @@ void Chunk::Update() {
                 }
 
                 // View from negative y
-                if (cYN) {
-                    if (y == 0 && !cYN->blk[x][CY - 1][z]) {
+                if (neighYN) {
+                    if (y == 0 && !neighYN->blk[x][CY - 1][z]) {
                         vertex[i++] = byte4(x, y, z, type);
                         vertex[i++] = byte4(x + 1, y, z, type);
                         vertex[i++] = byte4(x, y, z + 1, type);
@@ -119,8 +112,8 @@ void Chunk::Update() {
                 }
 
                 // View from positive y
-                if (cYP) {
-                    if (y == CY - 1 && !cYP->blk[x][0][z]) {
+                if (neighYP) {
+                    if (y == CY - 1 && !neighYP->blk[x][0][z]) {
                         vertex[i++] = byte4(x, y + 1, z, type);
                         vertex[i++] = byte4(x, y + 1, z + 1, type);
                         vertex[i++] = byte4(x + 1, y + 1, z, type);
@@ -139,8 +132,8 @@ void Chunk::Update() {
                 }
 
                 // View from negative z
-                if (cZN) {
-                    if (z == 0 && !cZN->blk[x][y][CZ - 1]) {
+                if (neighZN) {
+                    if (z == 0 && !neighZN->blk[x][y][CZ - 1]) {
                         vertex[i++] = byte4(x, y, z, type);
                         vertex[i++] = byte4(x, y + 1, z, type);
                         vertex[i++] = byte4(x + 1, y, z, type);
@@ -159,8 +152,8 @@ void Chunk::Update() {
                 }
 
                 // View from positive z
-                if (cZP) {
-                    if (z == CZ - 1 && !cZP->blk[x][y][0]) {
+                if (neighZP) {
+                    if (z == CZ - 1 && !neighZP->blk[x][y][0]) {
                         vertex[i++] = byte4(x, y, z + 1, type);
                         vertex[i++] = byte4(x + 1, y, z + 1, type);
                         vertex[i++] = byte4(x, y + 1, z + 1, type);
@@ -202,10 +195,38 @@ void Chunk::Render() {
     if (!elements)
         return;
 
-    //glEnable(GL_CULL_FACE);
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 
     glBindVertexArray(VAO);
 
     glDrawArrays(GL_TRIANGLES, 0, elements);
+}
+
+void Chunk::setNeighbours(Chunk* cXN, Chunk* cXP, Chunk* cYN, Chunk* cYP, Chunk* cZN, Chunk* cZP) {
+    // If neighbours changed, we need to rebuild their mesh
+    if (neighXN != cXN) {
+        neighXN = cXN;
+        changed = true;
+    }
+    if (neighXP != cXP) {
+        neighXP = cXP;
+        changed = true;
+    }
+    if (neighYN != cYN) {
+        neighYN = cYN;
+        changed = true;
+    }
+    if (neighYP != cYP) {
+        neighYP = cYP;
+        changed = true;
+    }
+    if (neighZN != cZN) {
+        neighZN = cZN;
+        changed = true;
+    }
+    if (neighZP != cZP) {
+        neighZP = cZP;
+        changed = true;
+    } 
 }

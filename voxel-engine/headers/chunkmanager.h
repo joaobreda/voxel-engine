@@ -1,31 +1,29 @@
 #ifndef CHUNKMANAGER_H
 #define CHUNKMANAGER_H
 
-#define SCX 16
-#define SCY 16
-#define SCZ 16
+// Number of chunks rendered around the player
+#define SCX 8
+#define SCY 8
+#define SCZ 8
 
 #include "chunk.h"
 #include "main.h"
 #include <math.h>
+#include <memory>
+#include <unordered_map>
+#include "glm/gtx/hash.hpp"
 
-using ChunkMap = std::unordered_map<glm::vec3, std::shared_ptr<Chunk>,
-	std::hash<glm::vec3>, std::equal_to<glm::vec3>>;
-using ChunkIterator = std::unordered_map<glm::vec3, std::shared_ptr<Chunk>,
-	std::hash<glm::vec3>, std::equal_to<glm::vec3>>::iterator;
+using ChunkMap = std::unordered_map<glm::ivec3, std::unique_ptr<Chunk>>;
 
 class ChunkManager {
+private:
+	glm::vec3 lastPlayerPos;
 public:
+	// Hashmap where we store visible chunks
 	ChunkMap chunks;
 	ChunkManager();
 	~ChunkManager();
-	inline ChunkIterator begin() { return chunks.begin(); }
-	inline ChunkIterator end() { return chunks.end(); }
-	inline std::shared_ptr<Chunk> GetChunk(const glm::vec3& pos) {
-		if (chunks[pos] != nullptr)
-			return chunks[pos];
-		return nullptr;
-	}
+	void Update();
 	void Render(Shader shader);
 };
 #endif
