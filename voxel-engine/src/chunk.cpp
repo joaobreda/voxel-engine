@@ -4,6 +4,7 @@ Chunk::Chunk(int i, int j, int k) {
     memset(blk, 0, sizeof(blk));
     elements = 0;
     changed = true;
+    glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     // Setting chunk position relative to map
     posX = i * CX;
@@ -174,9 +175,6 @@ void Chunk::Update() {
         }
     }
     elements = i;
-
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);

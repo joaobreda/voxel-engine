@@ -18,11 +18,10 @@ private:
     unsigned int VBO, VAO;
     int elements;
     bool changed;
-    Chunk *neighXN, *neighXP, *neighYN, *neighYP, *neighZN, *neighZP;
 public:
+    Chunk* neighXN, * neighXP, * neighYN, * neighYP, * neighZN, * neighZP;
     // Global map position of this chunk 
     int posX, posY, posZ;
-    // Reference of all other chunks
     Chunk(int i, int j, int k);
     ~Chunk();
     uint8_t Get(int x, int y, int z);

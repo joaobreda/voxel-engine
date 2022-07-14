@@ -1,6 +1,7 @@
 #include "../headers/process.h"
 
 extern float lastX, lastY, deltaTime;
+extern unsigned int SCR_WIDTH, SCR_HEIGHT;
 extern bool firstMouse;
 extern Camera camera;
 
@@ -50,10 +51,6 @@ GLFWwindow* setupWindow(int WIDTH, int HEIGHT, const char* TITLE) {
 void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
-    static bool wireframe = false;
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-        glPolygonMode(GL_FRONT_AND_BACK, (wireframe = !wireframe) ? GL_LINE : GL_FILL);
 
     static bool captMouse = false;
     if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)

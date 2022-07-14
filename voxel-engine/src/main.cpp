@@ -26,6 +26,7 @@ int main() {
     // imGUI state
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     static bool wireframeCheckBox = false;
+    float frustumFarBoundary = 300.0f;
     
     shader.use();
 
@@ -34,7 +35,7 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::SetNextWindowSize(ImVec2((float)350, (float)150));
+        ImGui::SetNextWindowSize(ImVec2((float)320, (float)190));
         // Creating an imGUI window
         {
             ImGui::Begin("Debug");
@@ -44,6 +45,9 @@ int main() {
             ImGui::Checkbox("Wireframe", &wireframeCheckBox);
             ImGui::Text("Blocks per chunk: %dx%dx%d", CX, CY, CZ);
             ImGui::Text("World chunks: %dx%dx%d", SCX, SCY, SCZ);
+            ImGui::Text("Frustum far boundary: ");
+            ImGui::SliderFloat("float", &frustumFarBoundary, 0.1f, 500.0f);
+
             ImGui::End();
         }
 
@@ -65,7 +69,8 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Pass projection matrix to shader (note that in this case it could change every frame)
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        // These last two parameters specify the lower and farest boundaries of our frustrum culling
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, frustumFarBoundary);
         shader.setMat4("projection", projection);
 
         // Camera/view transformation

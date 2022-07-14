@@ -2,9 +2,9 @@
 #define CHUNKMANAGER_H
 
 // Number of chunks rendered around the player
-#define SCX 8
-#define SCY 8
-#define SCZ 8
+#define SCX 16
+#define SCY 16
+#define SCZ 16
 
 #include "chunk.h"
 #include "main.h"

@@ -8,7 +8,7 @@ ChunkManager::ChunkManager() {
 
 ChunkManager::~ChunkManager() {
     for (ChunkMap::iterator iter = chunks.begin(); iter != chunks.end(); ++iter) {
-        (iter)->second.reset();
+        iter->second.reset();
     }
 }
 
@@ -22,11 +22,10 @@ void ChunkManager::Update() {
 
     // Unload chunks far away from the player
     for (ChunkMap::iterator iter = chunks.begin(); iter != chunks.end(); ) {
-        if ((*iter).second->posX / CX > playerPosX + SCX / 2 || (*iter).second->posX / CX < playerPosX + (-SCX / 2) ||
-            (*iter).second->posY / CY > playerPosY + SCY / 2 || (*iter).second->posY / CY < playerPosY + (-SCY / 2) || 
-            (*iter).second->posZ / CZ > playerPosZ + SCZ / 2 || (*iter).second->posZ / CZ < playerPosZ + (-SCZ / 2)) {
+        if (iter->second->posX / CX > playerPosX + SCX / 2 || iter->second->posX / CX < playerPosX + (-SCX / 2) ||
+            iter->second->posY / CY > playerPosY + SCY / 2 || iter->second->posY / CY < playerPosY + (-SCY / 2) ||
+            iter->second->posZ / CZ > playerPosZ + SCZ / 2 || iter->second->posZ / CZ < playerPosZ + (-SCZ / 2)) {
             chunks.erase(iter++);
-            // TO-DO: FREE CHUNK MEMORY, IT IS NOT BEING ERASED HERE SO IT'S ALWAYS INCREASING AS PLAYERS MOVE
         }
         else {
             ++iter;
@@ -44,8 +43,8 @@ void ChunkManager::Update() {
 
     // Set their neighbours
     for (ChunkMap::iterator iter = chunks.begin(); iter != chunks.end(); ++iter) {
-        key.x = (*iter).second->posX; key.y = (*iter).second->posY; key.z = (*iter).second->posZ;
-        (*iter).second->setNeighbours(chunks.count(glm::ivec3(key.x / CX - 1, key.y / CY, key.z / CZ)) ? chunks[glm::ivec3(key.x / CX - 1, key.y / CY, key.z / CZ)].get() : nullptr,
+        key.x = iter->second->posX; key.y = iter->second->posY; key.z = iter->second->posZ;
+        iter->second->setNeighbours(chunks.count(glm::ivec3(key.x / CX - 1, key.y / CY, key.z / CZ)) ? chunks[glm::ivec3(key.x / CX - 1, key.y / CY, key.z / CZ)].get() : nullptr,
             chunks.count(glm::ivec3(key.x / CX + 1, key.y / CY, key.z / CZ)) ? chunks[glm::ivec3(key.x / CX + 1, key.y / CY, key.z / CZ)].get() : nullptr,
             chunks.count(glm::ivec3(key.x / CX, key.y / CY - 1, key.z / CZ)) ? chunks[glm::ivec3(key.x / CX, key.y / CY - 1, key.z / CZ)].get() : nullptr,
             chunks.count(glm::ivec3(key.x / CX, key.y / CY + 1, key.z / CZ)) ? chunks[glm::ivec3(key.x / CX, key.y / CY + 1, key.z / CZ)].get() : nullptr,
@@ -67,11 +66,11 @@ void ChunkManager::Render(Shader shader) {
     if (!chunks.empty()) {
         for (ChunkMap::iterator iter = chunks.begin(); iter != chunks.end(); ++iter) {
             // Changing each chunk to their position so they aren't stacked on top of eachother
-            pos.x = (*iter).second->posX; pos.y = (*iter).second->posY; pos.z = (*iter).second->posZ;
+            pos.x = iter->second->posX; pos.y = iter->second->posY; pos.z = iter->second->posZ;
             glm::mat4 model = glm::translate(glm::mat4(1), pos);
             shader.setMat4("model", model);
 
-            (*iter).second->Render();
+            iter->second->Render();
         }
     }
 }
