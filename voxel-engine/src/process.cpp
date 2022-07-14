@@ -49,13 +49,21 @@ GLFWwindow* setupWindow(int WIDTH, int HEIGHT, const char* TITLE) {
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 void processInput(GLFWwindow* window) {
+    static bool captMouse = false;
+    static bool captMouseLock = true;
+
+    // Close program
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
-    static bool captMouse = false;
-    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+    // Capture mouse
+    if (glfwGetKey(window, GLFW_KEY_T) != GLFW_PRESS)
+        captMouseLock = false;
+    if (glfwGetKey(window, GLFW_KEY_T) != GLFW_RELEASE && !captMouseLock) {
+        if (captMouse) firstMouse = true;
         glfwSetInputMode(window, GLFW_CURSOR, (captMouse = !captMouse) ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
-
+        captMouseLock = true;
+    }
+    // Camera movement
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -68,6 +76,7 @@ void processInput(GLFWwindow* window) {
 
 // glfw: whenever the mouse moves, this callback is called
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) return;
     if (firstMouse) {
         lastX = xpos;
         lastY = ypos;

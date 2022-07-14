@@ -35,16 +35,17 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::SetNextWindowSize(ImVec2((float)320, (float)190));
+        ImGui::SetNextWindowSize(ImVec2((float)320, (float)210));
         // Creating an imGUI window
         {
             ImGui::Begin("Debug");
+            ImGui::TextColored(ImVec4(1, 1, 0, 1), "Press T to capture/uncapture mouse");
             ImGui::Text("Avg FPS: %.2f", ImGui::GetIO().Framerate);
             ImGui::Text("Camera pos. X: %.1f | Y: %.1f | Z: %.1f", camera.Position[0], camera.Position[1], camera.Position[2]);
             ImGui::Text("Camera world pos. X: %.1f | Y: %.1f | Z: %.1f", floor(camera.Position[0] / CX), floor(camera.Position[1] / CY), floor(camera.Position[2] / CZ));
-            ImGui::Checkbox("Wireframe", &wireframeCheckBox);
             ImGui::Text("Blocks per chunk: %dx%dx%d", CX, CY, CZ);
             ImGui::Text("World chunks: %dx%dx%d", SCX, SCY, SCZ);
+            ImGui::Checkbox("Wireframe", &wireframeCheckBox);
             ImGui::Text("Frustum far boundary: ");
             ImGui::SliderFloat("float", &frustumFarBoundary, 0.1f, 500.0f);
 
