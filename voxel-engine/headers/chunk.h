@@ -8,6 +8,10 @@
 
 #include <glad/glad.h> 
 #include <glm/gtc/type_ptr.hpp>
+#include "noiseutils.h"
+#include <iostream>
+#include <sstream>
+#include <string>
 
 typedef glm::tvec4<GLbyte> byte4;
 
@@ -24,8 +28,7 @@ public:
     int posX, posY, posZ;
     Chunk(int i, int j, int k);
     ~Chunk();
-    uint8_t Get(int x, int y, int z);
-    void Set(int x, int y, int z, uint8_t type);
+    uint8_t GetNeighbourBlock(Chunk* neighbour, int x, int y, int z);
     void Update();
     void Render();
     void setNeighbours(Chunk* neighXN, Chunk* neighXP, Chunk* neighYN, Chunk* neighYP, Chunk* neighZN, Chunk* neighZP);

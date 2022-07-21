@@ -23,7 +23,6 @@ void ChunkManager::Update() {
     // Unload chunks far away from the player
     for (ChunkMap::iterator iter = chunks.begin(); iter != chunks.end(); ) {
         if (iter->second->posX / CX > playerPosX + SCX / 2 || iter->second->posX / CX < playerPosX + (-SCX / 2) ||
-            iter->second->posY / CY > playerPosY + SCY / 2 || iter->second->posY / CY < playerPosY + (-SCY / 2) ||
             iter->second->posZ / CZ > playerPosZ + SCZ / 2 || iter->second->posZ / CZ < playerPosZ + (-SCZ / 2)) {
             chunks.erase(iter++);
         }
@@ -34,10 +33,10 @@ void ChunkManager::Update() {
  
     // Create chunks around the player
     for (int x = playerPosX + (-SCX / 2); x <= playerPosX + SCX / 2; x++)
-        for (int y = playerPosY + (-SCY / 2); y <= playerPosY + SCY / 2; y++)
+        for (int y = 0; y < SCY; y++)
             for (int z = playerPosZ + (-SCZ / 2); z <= playerPosZ + SCZ / 2; z++) {
                 key.x = x; key.y = y; key.z = z;
-                if(!chunks[key])
+                if (!chunks[key])
                     chunks[key] = std::unique_ptr<Chunk>(new Chunk(x, y, z));
             }
 
