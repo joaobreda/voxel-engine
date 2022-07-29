@@ -7,7 +7,7 @@ float lastX = SCR_WIDTH / 2.0f, lastY = SCR_HEIGHT / 2.0f;
 float deltaTime = 0.0f, lastFrame = 0.0f;
 // Check if first time moving mouse to prevent mouse jump
 bool firstMouse = true;
-Camera camera(glm::vec3(50.0f, 70.0f, 100.0f));
+Camera camera(glm::vec3(50.0f, 85.0f, 100.0f));
 
 int main() {
     GLFWwindow* window = setupWindow(SCR_WIDTH, SCR_HEIGHT, "Voxel Engine");

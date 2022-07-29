@@ -10,17 +10,35 @@ Chunk::Chunk(int i, int j, int k, utils::NoiseMap heightMap) {
     posX = i * CX;
     posY = j * CY;
     posZ = k * CZ;
+    float maxHeightValue = (CY * SCY - 1);
     for (int x = 0; x < CX; x++) {
         for (int z = 0; z < CZ; z++) {
             // Get height value for every x, z position
             float heightmapValue = (heightMap.GetValue(x, z) + 1) / 2;
-            float heightValue = heightmapValue * ((CY - 1) * SCY) - posY;
+            float heightValue = heightmapValue * maxHeightValue - posY;
             if (heightValue > CY) heightValue = CY;
             // Create a bottom layer for the lowest chunk so no x, z position is empty
             if (posY == 0 && heightValue < 1) heightValue = 1;
             // Spawn cubes until it reaches height value
             for (int y = 0; y < heightValue; y++) {
-                blk[x][y][z] = 1;
+                // Snow
+                if((y + posY) == maxHeightValue)
+                    blk[x][y][z] = 1;
+                // Rock
+                else if ((y + posY) > (maxHeightValue * 0.75))
+                    blk[x][y][z] = 2;
+                // Dirt
+                else if ((y + posY) > (maxHeightValue * 0.50))
+                    blk[x][y][z] = 3;
+                // Grass
+                else if ((y + posY) > (maxHeightValue * 0.15))
+                    blk[x][y][z] = 4;
+                // Sand
+                else if ((y + posY) > (maxHeightValue * 0.05))
+                    blk[x][y][z] = 5;
+                // Shallow
+                else
+                    blk[x][y][z] = 6;
             }
         }
     }
