@@ -6,6 +6,11 @@
 #define CY 16
 #define CZ 16
 
+// Number of chunks rendered around the player
+#define SCX 16
+#define SCY 4
+#define SCZ 16
+
 #include <glad/glad.h> 
 #include <glm/gtc/type_ptr.hpp>
 #include "noiseutils.h"
@@ -26,7 +31,7 @@ public:
     Chunk* neighXN, * neighXP, * neighYN, * neighYP, * neighZN, * neighZP;
     // Global map position of this chunk 
     int posX, posY, posZ;
-    Chunk(int i, int j, int k);
+    Chunk(int i, int j, int k, utils::NoiseMap heightMap);
     ~Chunk();
     uint8_t GetNeighbourBlock(Chunk* neighbour, int x, int y, int z);
     void Update();

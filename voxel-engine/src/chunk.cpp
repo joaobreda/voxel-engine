@@ -1,6 +1,6 @@
 #include "../headers/chunk.h"
 
-Chunk::Chunk(int i, int j, int k) {
+Chunk::Chunk(int i, int j, int k, utils::NoiseMap heightMap) {
     memset(blk, 0, sizeof(blk));
     elements = 0;
     changed = true;
@@ -11,9 +11,16 @@ Chunk::Chunk(int i, int j, int k) {
     posY = j * CY;
     posZ = k * CZ;
     for (int x = 0; x < CX; x++) {
-        for (int y = 0; y < CY; y++) {
-            for (int z = 0; z < CZ; z++) {
-                blk[x][y][z] = j == CX-1 && x == 5 && y == CY-1 ? 0 : 1;
+        for (int z = 0; z < CZ; z++) {
+            // Get height value for every x, z position
+            float heightmapValue = (heightMap.GetValue(x, z) + 1) / 2;
+            float heightValue = heightmapValue * ((CY - 1) * SCY) - posY;
+            if (heightValue > CY) heightValue = CY;
+            // Create a bottom layer for the lowest chunk so no x, z position is empty
+            if (posY == 0 && heightValue < 1) heightValue = 1;
+            // Spawn cubes until it reaches height value
+            for (int y = 0; y < heightValue; y++) {
+                blk[x][y][z] = 1;
             }
         }
     }

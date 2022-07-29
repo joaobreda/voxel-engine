@@ -3,6 +3,15 @@
 extern Camera camera;
 
 ChunkManager::ChunkManager() {
+    // Set a random seed number for our heightmap generation
+    std::mt19937 mt(rd());
+    std::uniform_real_distribution<double> dist(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+    myModule.SetSeed(dist(mt));
+    // Create random heightmap using Perlin noise
+    heightMapBuilder.SetSourceModule(myModule);
+    heightMapBuilder.SetDestNoiseMap(heightMap);
+    heightMapBuilder.SetDestSize(CX, CZ);
+
     Update();
 }
 
@@ -36,8 +45,12 @@ void ChunkManager::Update() {
         for (int y = 0; y < SCY; y++)
             for (int z = playerPosZ + (-SCZ / 2); z <= playerPosZ + SCZ / 2; z++) {
                 key.x = x; key.y = y; key.z = z;
-                if (!chunks[key])
-                    chunks[key] = std::unique_ptr<Chunk>(new Chunk(x, y, z));
+                if (!chunks[key]) {
+                    // Heightmap has continuous data, we only need to change bounds for every chunk
+                    heightMapBuilder.SetBounds(x / 10.0f, x / 10.0f + 0.1, z / 10.0f, z / 10.0f + 0.1);
+                    heightMapBuilder.Build();
+                    chunks[key] = std::unique_ptr<Chunk>(new Chunk(x, y, z, heightMap));
+                }
             }
 
     // Set their neighbours
