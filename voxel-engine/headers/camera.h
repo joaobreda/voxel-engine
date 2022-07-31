@@ -19,7 +19,7 @@ enum Camera_Movement {
 class Camera {
 private:
     // Default camera values
-    const float SPEED = 40.0f;
+    const float SPEED = 80.0f;
     const float SENSITIVITY = 0.1f;
     const float ZOOM = 45.0f;
     // camera Attributes

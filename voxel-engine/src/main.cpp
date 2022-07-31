@@ -26,7 +26,7 @@ int main() {
     // imGUI state
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     static bool wireframeCheckBox = false;
-    float frustumFarBoundary = 300.0f;
+    float frustumFarBoundary = 500.0f;
     
     shader.use();
 
@@ -47,7 +47,7 @@ int main() {
             ImGui::Text("World chunks: %dx%dx%d", SCX, SCY, SCZ);
             ImGui::Checkbox("Wireframe", &wireframeCheckBox);
             ImGui::Text("Frustum far boundary: ");
-            ImGui::SliderFloat("float", &frustumFarBoundary, 0.1f, 5000.0f);
+            ImGui::SliderFloat("float", &frustumFarBoundary, 0.1f, 2000.0f);
 
             ImGui::End();
         }
@@ -68,6 +68,12 @@ int main() {
 
         glClearColor(55.0f/255.0f , 184.0f/255.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Light properties
+        shader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+        shader.setVec3("viewPos", camera.Position);
+        shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        shader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
 
         // Pass projection matrix to shader (note that in this case it could change every frame)
         // These last two parameters specify the lower and farest boundaries of our frustrum culling

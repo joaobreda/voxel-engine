@@ -7,9 +7,9 @@
 #define CZ 16
 
 // Number of chunks rendered around the player
-#define SCX 16
+#define SCX 32
 #define SCY 4
-#define SCZ 16
+#define SCZ 32
 
 #include <glad/glad.h> 
 #include <glm/gtc/type_ptr.hpp>
@@ -18,7 +18,11 @@
 #include <sstream>
 #include <string>
 
-typedef glm::tvec4<GLbyte> byte4;
+struct byte4 {
+    uint8_t x, y, z, w, nx, ny, nz;
+    byte4() {}
+    byte4(uint8_t x, uint8_t y, uint8_t z, uint8_t w, int8_t nx, int8_t ny, int8_t nz) : x(x), y(y), z(z), w(w), nx(nx), ny(ny), nz(nz) {}
+};
 
 class Chunk {
 private:

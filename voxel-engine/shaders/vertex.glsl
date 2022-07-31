@@ -1,7 +1,10 @@
 #version 330 core
 layout (location = 0) in vec4 aPos;
+layout (location = 1) in vec3 aNormal;
 
+out vec3 FragPos;
 out vec3 ourColor;
+out vec3 Normal;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -9,7 +12,7 @@ uniform mat4 projection;
 
 void main()
 {
-	gl_Position = projection * view * model * vec4(aPos.xyz, 1.0f);
+	// Deciding cube color depending on it's type
     // Snow
 	if (aPos.w == 1)
 	    ourColor = vec3(255.0f/255.0f, 255.0f/255.0f, 255.0f/255.0f);
@@ -28,4 +31,10 @@ void main()
     // Shallow
 	else
 	    ourColor = vec3(0.0f/255.0f, 0.0f/255.0f, 255.0f/255.0f);
+
+	FragPos = vec3(model * vec4(aPos.xyz, 1.0));
+	//Normal = mat3(transpose(inverse(model))) * aNormal;  
+    Normal = aNormal;  
+    
+    gl_Position = projection * view * vec4(FragPos, 1.0);
 }
