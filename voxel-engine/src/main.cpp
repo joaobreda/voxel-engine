@@ -72,8 +72,8 @@ int main() {
         // Light properties
         shader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
         shader.setVec3("viewPos", camera.Position);
-        shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-        shader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        shader.setVec3("light.ambient", 1.0f, 1.0f, 1.0f);
+        shader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
 
         // Pass projection matrix to shader (note that in this case it could change every frame)
         // These last two parameters specify the lower and farest boundaries of our frustrum culling

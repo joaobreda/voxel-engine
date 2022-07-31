@@ -59,7 +59,7 @@ uint8_t Chunk::GetNeighbourBlock(Chunk* neighbour, int x, int y, int z) {
 void Chunk::Update() {
     changed = false;
 
-    byte4 vertex[CX * CY * CZ + CX * CY];
+    byte4 vertex[CX * CY * CZ * 2];
     // byte4* vertex = new byte4[CX * CY * CZ * 6 * 6];
     int i = 0;
 
