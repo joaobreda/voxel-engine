@@ -65,7 +65,7 @@ void ChunkManager::Update() {
     }
 }
 
-void ChunkManager::Render(Shader shader) {
+void ChunkManager::Render(Shader shader, glm::mat4 &vp) {
     // Checking if player position changed, to load/unload chunks
     int playerPosX = floor(camera.Position[0] / CX);
     int playerPosY = floor(camera.Position[1] / CY);
@@ -81,6 +81,18 @@ void ChunkManager::Render(Shader shader) {
             pos.x = iter->second->posX; pos.y = iter->second->posY; pos.z = iter->second->posZ;
             glm::mat4 model = glm::translate(glm::mat4(1), pos);
             shader.setMat4("model", model);
+
+            // Checking if chunk is on screen to render or not
+            glm::vec4 center = (vp * model) * glm::vec4(CX / 2, CY / 2, CZ / 2, 1);
+            float d = glm::length(center);
+            center.x /= center.w;
+            center.y /= center.w;
+            // Don't render if chunk is behind the camera
+            if (center.z < -CY / 2)
+                continue;
+            // Don't render if chunk is outside the screen
+            if (fabsf(center.x) > 1 + fabsf(CY * 2 / center.w) || fabsf(center.y) > 1 + fabsf(CY * 2 / center.w))
+                continue;
 
             iter->second->Render();
         }

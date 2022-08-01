@@ -7,9 +7,9 @@
 #define CZ 16
 
 // Number of chunks rendered around the player
-#define SCX 32
+#define SCX 48
 #define SCY 4
-#define SCZ 32
+#define SCZ 48
 
 #include <glad/glad.h> 
 #include <glm/gtc/type_ptr.hpp>

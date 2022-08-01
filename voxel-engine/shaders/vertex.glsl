@@ -2,7 +2,6 @@
 layout (location = 0) in vec4 aPos;
 layout (location = 1) in vec3 aNormal;
 
-out vec3 FragPos;
 out vec3 ourColor;
 out vec3 Normal;
 
@@ -32,7 +31,7 @@ void main()
 	else
 	    ourColor = vec3(0.0f/255.0f, 0.0f/255.0f, 255.0f/255.0f);
 
-	FragPos = vec3(model * vec4(aPos.xyz, 1.0));
+	vec3 FragPos = vec3(model * vec4(aPos.xyz, 1.0));
 	//Normal = mat3(transpose(inverse(model))) * aNormal;  
     Normal = aNormal;  
     

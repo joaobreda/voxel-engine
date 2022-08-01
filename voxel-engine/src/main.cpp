@@ -85,7 +85,8 @@ int main() {
         shader.setMat4("view", view);
 
         // Model matrix
-        chunkManager.Render(shader);
+        glm::mat4 vp = projection * view;
+        chunkManager.Render(shader, vp);
 
         // Render imGUI after for it to appear on top of everything else
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

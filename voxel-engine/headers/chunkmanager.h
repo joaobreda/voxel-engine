@@ -28,6 +28,6 @@ public:
 	ChunkManager();
 	~ChunkManager();
 	void Update();
-	void Render(Shader shader);
+	void Render(Shader shader, glm::mat4 &vp);
 };
 #endif

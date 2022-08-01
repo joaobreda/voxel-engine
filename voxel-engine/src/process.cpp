@@ -14,6 +14,8 @@ GLFWwindow* setupWindow(int WIDTH, int HEIGHT, const char* TITLE) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // MSAA
+    glfwWindowHint(GLFW_SAMPLES, 4);
     // Create window
     GLFWwindow* GLwindow = glfwCreateWindow(WIDTH, HEIGHT, TITLE, NULL, NULL);
     if (GLwindow == NULL) {
