@@ -18,10 +18,20 @@
 #include <sstream>
 #include <string>
 
-struct byte4 {
+struct CubeVertex {
     uint8_t x, y, z, w, nx, ny, nz;
-    byte4() {}
-    byte4(uint8_t x, uint8_t y, uint8_t z, uint8_t w, int8_t nx, int8_t ny, int8_t nz) : x(x), y(y), z(z), w(w), nx(nx), ny(ny), nz(nz) {}
+    CubeVertex() {}
+    CubeVertex(uint8_t x, uint8_t y, uint8_t z, uint8_t w, int8_t nx, int8_t ny, int8_t nz) : x(x), y(y), z(z), w(w), nx(nx), ny(ny), nz(nz) {}
+};
+
+enum BlockType: uint8_t {
+    BlockType_Empty = 0,
+    BlockType_Snow,
+    BlockType_Rock,
+    BlockType_Dirt,
+    BlockType_Grass,
+    BlockType_Sand,
+    BlockType_Shallow,
 };
 
 class Chunk {
@@ -32,7 +42,7 @@ private:
     int elements;
     bool changed;
 public:
-    Chunk* neighXN, * neighXP, * neighYN, * neighYP, * neighZN, * neighZP;
+    Chunk *neighXN, *neighXP, *neighYN, *neighYP, *neighZN, *neighZP;
     // Global map position of this chunk 
     int posX, posY, posZ;
     Chunk(int i, int j, int k, utils::NoiseMap heightMap);

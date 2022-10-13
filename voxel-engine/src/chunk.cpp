@@ -21,24 +21,18 @@ Chunk::Chunk(int i, int j, int k, utils::NoiseMap heightMap) {
             if (posY == 0 && heightValue < 1) heightValue = 1;
             // Spawn cubes until it reaches height value
             for (int y = 0; y < heightValue; y++) {
-                // Snow
                 if((y + posY) == maxHeightValue)
-                    blk[x][y][z] = 1;
-                // Rock
+                    blk[x][y][z] = BlockType_Snow;
                 else if ((y + posY) > (maxHeightValue * 0.75))
-                    blk[x][y][z] = 2;
-                // Dirt
+                    blk[x][y][z] = BlockType_Rock;
                 else if ((y + posY) > (maxHeightValue * 0.50))
-                    blk[x][y][z] = 3;
-                // Grass
+                    blk[x][y][z] = BlockType_Dirt;
                 else if ((y + posY) > (maxHeightValue * 0.15))
-                    blk[x][y][z] = 4;
-                // Sand
+                    blk[x][y][z] = BlockType_Grass;
                 else if ((y + posY) > (maxHeightValue * 0.05))
-                    blk[x][y][z] = 5;
-                // Shallow
+                    blk[x][y][z] = BlockType_Sand;
                 else
-                    blk[x][y][z] = 6;
+                    blk[x][y][z] = BlockType_Shallow;
             }
         }
     }
@@ -59,8 +53,7 @@ uint8_t Chunk::GetNeighbourBlock(Chunk* neighbour, int x, int y, int z) {
 void Chunk::Update() {
     changed = false;
 
-    byte4 vertex[CX * CY * CZ * 2];
-    // byte4* vertex = new byte4[CX * CY * CZ * 6 * 6];
+    CubeVertex vertex[CX * CY * CZ * 2];
     int i = 0;
 
     for (int x = 0; x < CX; x++) {
@@ -77,67 +70,74 @@ void Chunk::Update() {
                 // View from negative x
                 if ((x == 0 && !GetNeighbourBlock(neighXN, CX - 1, y, z)) || 
                     (x > 0 && !blk[x - 1][y][z])) {
-                        vertex[i++] = byte4(x, y, z, type, -1, 0, 0);
-                        vertex[i++] = byte4(x, y, z + 1, type, -1, 0, 0);
-                        vertex[i++] = byte4(x, y + 1, z, type, -1, 0, 0);
-                        vertex[i++] = byte4(x, y + 1, z, type, -1, 0, 0);
-                        vertex[i++] = byte4(x, y, z + 1, type, -1, 0, 0);
-                        vertex[i++] = byte4(x, y + 1, z + 1, type, -1, 0, 0);
+                        // bottom triangle
+                        vertex[i++] = CubeVertex(x    , y    , z    , type, -1, 0, 0); // bottom left
+                        vertex[i++] = CubeVertex(x    , y    , z + 1, type, -1, 0, 0); // bottom right
+                        vertex[i++] = CubeVertex(x    , y + 1, z    , type, -1, 0, 0); // top left
+                        // top triangle
+                        vertex[i++] = CubeVertex(x    , y + 1, z    , type, -1, 0, 0); // top left
+                        vertex[i++] = CubeVertex(x    , y    , z + 1, type, -1, 0, 0); // bottom right
+                        vertex[i++] = CubeVertex(x    , y + 1, z + 1, type, -1, 0, 0); // top right
                 }
-
                 // View from positive x
                 if ((x == CX - 1 && !GetNeighbourBlock(neighXP, 0, y, z)) ||
                     (x < CX - 1 && !blk[x + 1][y][z])) {
-                        vertex[i++] = byte4(x + 1, y, z, type, 1, 0, 0);
-                        vertex[i++] = byte4(x + 1, y + 1, z, type, 1, 0, 0);
-                        vertex[i++] = byte4(x + 1, y, z + 1, type, 1, 0, 0);
-                        vertex[i++] = byte4(x + 1, y + 1, z, type, 1, 0, 0);
-                        vertex[i++] = byte4(x + 1, y + 1, z + 1, type, 1, 0, 0);
-                        vertex[i++] = byte4(x + 1, y, z + 1, type, 1, 0, 0);
+                        // bottom triangle
+                        vertex[i++] = CubeVertex(x + 1, y    , z    , type, 1, 0, 0); // bottom left
+                        vertex[i++] = CubeVertex(x + 1, y + 1, z    , type, 1, 0, 0); // bottom right
+                        vertex[i++] = CubeVertex(x + 1, y    , z + 1, type, 1, 0, 0); // top left
+                        // top triangle
+                        vertex[i++] = CubeVertex(x + 1, y + 1, z    , type, 1, 0, 0); // top left
+                        vertex[i++] = CubeVertex(x + 1, y + 1, z + 1, type, 1, 0, 0); // bottom right
+                        vertex[i++] = CubeVertex(x + 1, y    , z + 1, type, 1, 0, 0); // top right
                 }
-
                 // View from negative y
                 if ((y == 0 && !GetNeighbourBlock(neighYN, x, CY - 1, z)) ||
                     (y > 0 && !blk[x][y - 1][z])) {
-                        vertex[i++] = byte4(x, y, z, type, 0, -1, 0);
-                        vertex[i++] = byte4(x + 1, y, z, type, 0, -1, 0);
-                        vertex[i++] = byte4(x, y, z + 1, type, 0, -1, 0);
-                        vertex[i++] = byte4(x + 1, y, z, type, 0, -1, 0);
-                        vertex[i++] = byte4(x + 1, y, z + 1, type, 0, -1, 0);
-                        vertex[i++] = byte4(x, y, z + 1, type, 0, -1, 0);
+                        // bottom triangle
+                        vertex[i++] = CubeVertex(x    , y    , z    , type, 0, -1, 0); // bottom left
+                        vertex[i++] = CubeVertex(x + 1, y    , z    , type, 0, -1, 0); // bottom right
+                        vertex[i++] = CubeVertex(x    , y    , z + 1, type, 0, -1, 0); // top left
+                        // top triangle
+                        vertex[i++] = CubeVertex(x + 1, y    , z    , type, 0, -1, 0); // top left
+                        vertex[i++] = CubeVertex(x + 1, y    , z + 1, type, 0, -1, 0); // bottom right
+                        vertex[i++] = CubeVertex(x    , y    , z + 1, type, 0, -1, 0); // top right
                 }
-
                 // View from positive y
                 if ((y == CY - 1 && !GetNeighbourBlock(neighYP, x, 0, z)) ||
                     (y < CY - 1 && !blk[x][y + 1][z])) {
-                        vertex[i++] = byte4(x, y + 1, z, type, 0, 1, 0);
-                        vertex[i++] = byte4(x, y + 1, z + 1, type, 0, 1, 0);
-                        vertex[i++] = byte4(x + 1, y + 1, z, type, 0, 1, 0);
-                        vertex[i++] = byte4(x + 1, y + 1, z, type, 0, 1, 0);
-                        vertex[i++] = byte4(x, y + 1, z + 1, type, 0, 1, 0);
-                        vertex[i++] = byte4(x + 1, y + 1, z + 1, type, 0, 1, 0);
+                        // bottom triangle
+                        vertex[i++] = CubeVertex(x    , y + 1, z    , type, 0, 1, 0); // bottom left
+                        vertex[i++] = CubeVertex(x    , y + 1, z + 1, type, 0, 1, 0); // bottom right
+                        vertex[i++] = CubeVertex(x + 1, y + 1, z    , type, 0, 1, 0); // top left
+                        // top triangle
+                        vertex[i++] = CubeVertex(x + 1, y + 1, z    , type, 0, 1, 0); // top left
+                        vertex[i++] = CubeVertex(x    , y + 1, z + 1, type, 0, 1, 0); // bottom right
+                        vertex[i++] = CubeVertex(x + 1, y + 1, z + 1, type, 0, 1, 0); // top right
                 }
-
                 // View from negative z
                 if ((z == 0 && !GetNeighbourBlock(neighZN, x, y, CZ - 1)) ||
                     (z > 0 && !blk[x][y][z - 1])) {
-                        vertex[i++] = byte4(x, y, z, type, 0, 0, -1);
-                        vertex[i++] = byte4(x, y + 1, z, type, 0, 0, -1);
-                        vertex[i++] = byte4(x + 1, y, z, type, 0, 0, -1);
-                        vertex[i++] = byte4(x, y + 1, z, type, 0, 0, -1);
-                        vertex[i++] = byte4(x + 1, y + 1, z, type, 0, 0, -1);
-                        vertex[i++] = byte4(x + 1, y, z, type, 0, 0, -1);
+                        // bottom triangle
+                        vertex[i++] = CubeVertex(x    , y    , z    , type, 0, 0, -1); // bottom left
+                        vertex[i++] = CubeVertex(x    , y + 1, z    , type, 0, 0, -1); // bottom right
+                        vertex[i++] = CubeVertex(x + 1, y    , z    , type, 0, 0, -1); // top left
+                        // top triangle
+                        vertex[i++] = CubeVertex(x    , y + 1, z    , type, 0, 0, -1); // top left
+                        vertex[i++] = CubeVertex(x + 1, y + 1, z    , type, 0, 0, -1); // bottom right
+                        vertex[i++] = CubeVertex(x + 1, y    , z    , type, 0, 0, -1); // top right
                 }
-
                 // View from positive z
                 if ((z == CZ - 1 && !GetNeighbourBlock(neighZP, x, y, 0)) ||
                     (z < CZ - 1 && !blk[x][y][z + 1])) {
-                        vertex[i++] = byte4(x, y, z + 1, type, 0, 0, 1);
-                        vertex[i++] = byte4(x + 1, y, z + 1, type, 0, 0, 1);
-                        vertex[i++] = byte4(x, y + 1, z + 1, type, 0, 0, 1);
-                        vertex[i++] = byte4(x, y + 1, z + 1, type, 0, 0, 1);
-                        vertex[i++] = byte4(x + 1, y, z + 1, type, 0, 0, 1);
-                        vertex[i++] = byte4(x + 1, y + 1, z + 1, type, 0, 0, 1);
+                        // bottom triangle
+                        vertex[i++] = CubeVertex(x    , y    , z + 1, type, 0, 0, 1); // bottom left
+                        vertex[i++] = CubeVertex(x + 1, y    , z + 1, type, 0, 0, 1); // bottom right
+                        vertex[i++] = CubeVertex(x    , y + 1, z + 1, type, 0, 0, 1); // top left
+                        // top triangle
+                        vertex[i++] = CubeVertex(x    , y + 1, z + 1, type, 0, 0, 1); // top left
+                        vertex[i++] = CubeVertex(x + 1, y    , z + 1, type, 0, 0, 1); // bottom right
+                        vertex[i++] = CubeVertex(x + 1, y + 1, z + 1, type, 0, 0, 1); // top right
                 }
             }
         }
@@ -149,12 +149,15 @@ void Chunk::Update() {
 
     glBufferData(GL_ARRAY_BUFFER, elements * sizeof(*vertex), vertex, GL_STATIC_DRAW);
 
-    // position and type attributes
-    glVertexAttribPointer(0, 4, GL_BYTE, GL_FALSE, sizeof(byte4), (void*)0);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_BYTE, GL_FALSE, sizeof(CubeVertex), (void*)0);
     glEnableVertexAttribArray(0);
-    // normal attribute
-    glVertexAttribPointer(1, 3, GL_BYTE, GL_FALSE, sizeof(byte4), (void*)(4 * sizeof(uint8_t)));
+    // cube type attribute
+    glVertexAttribIPointer(1, 1, GL_BYTE, sizeof(CubeVertex), (void*)(3 * sizeof(uint8_t)));
     glEnableVertexAttribArray(1);
+    // normal attribute
+    glVertexAttribPointer(2, 3, GL_BYTE, GL_FALSE, sizeof(CubeVertex), (void*)(4 * sizeof(uint8_t)));
+    glEnableVertexAttribArray(2);
 }
 
 void Chunk::Render() {
