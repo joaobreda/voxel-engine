@@ -30,13 +30,10 @@ void ChunkManager::Update() {
     lastPlayerPos = glm::vec3(playerPosX, playerPosY, playerPosZ);
 
     // Unload chunks far away from the player
-    for (ChunkMap::iterator iter = chunks.begin(); iter != chunks.end(); ) {
+    for (ChunkMap::iterator iter = chunks.begin(); iter != chunks.end(); ++iter) {
         if (iter->second->posX / CX > playerPosX + SCX / 2 || iter->second->posX / CX < playerPosX + (-SCX / 2) ||
             iter->second->posZ / CZ > playerPosZ + SCZ / 2 || iter->second->posZ / CZ < playerPosZ + (-SCZ / 2)) {
-            chunks.erase(iter++);
-        }
-        else {
-            ++iter;
+            chunks.erase(iter);
         }
     }
  

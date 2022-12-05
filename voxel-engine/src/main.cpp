@@ -10,9 +10,9 @@ bool firstMouse = true;
 Camera camera(glm::vec3(50.0f, 85.0f, 100.0f));
 
 int main() {
-    GLFWwindow* window = setupWindow(SCR_WIDTH, SCR_HEIGHT, "Voxel Engine");
+    GLFWwindow* window = setupWindow(SCR_WIDTH, SCR_HEIGHT, "Voxel Terrain");
     ChunkManager chunkManager;
-    Shader shader("C:\\Users\\Breda\\Documents\\voxel-engine\\voxel-engine\\shaders\\vertex.glsl", "C:\\Users\\Breda\\Documents\\voxel-engine\\voxel-engine\\shaders\\fragment.glsl");
+    Shader shader("shaders/vertex.glsl", "shaders/fragment.glsl");
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
